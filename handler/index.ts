@@ -16,7 +16,7 @@ export function handleInitMessage(initMessageBody: Readonly<InitMessage>) {
     in_reply_to: initMessageBody.body.msg_id,
   });
 
-  return nodeId;
+  return { nodeId, allNodes: initMessageBody.body.node_ids };
 }
 
 export function handleEchoMessage(echoMessageBody: Readonly<EchoMessage>) {

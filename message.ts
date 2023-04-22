@@ -31,7 +31,7 @@ const TopologyMessageBody = z.object({
 const BroadcastMessageBody = z.object({
   type: z.literal("broadcast"),
   message: z.number(),
-  msg_id: z.number().optional(),
+  msg_id: z.number(),
 });
 
 const ReadMessageBody = z.object({
