@@ -12,16 +12,19 @@ export function handleBroadcast(
   const message = broadcastMessage.body.message;
   const isMessageAlreadyPresent = nodeMessage.has(message);
 
+  const isSrcAnotherNode = nodeData.allNodes.includes(broadcastMessage.src);
+
   if (!isMessageAlreadyPresent) {
     nodeMessage.add(message);
-    propagate({ nodeData, message });
+
+    if (isSrcAnotherNode) {
+      sendMessageToNodes(message, nodeData, [broadcastMessage.src]);
+    } else {
+      propagate({ nodeData, message });
+    }
   }
 
   addNodesToMessageRecord(broadcastMessage);
-
-  const isSrcAnotherNode = nodeData.allNodes.find(
-    (value) => value === broadcastMessage.src
-  );
 
   if (isSrcAnotherNode) {
     return;
@@ -70,7 +73,7 @@ type PropagateArgs = {
 };
 
 function propagate({ nodeData, message }: PropagateArgs) {
-  const nodesToSend = nodeData.topology.filter((nodeId) => {
+  const nodesToSend = nodeData.allNodes.filter((nodeId) => {
     const messageRecord = getRecord(message);
     return !messageRecord.has(nodeId);
   });
@@ -81,7 +84,7 @@ function propagate({ nodeData, message }: PropagateArgs) {
 
   sendMessageToNodes(message, nodeData, nodesToSend);
 
-  setTimeout(() => propagate({ nodeData, message }), 0);
+  setTimeout(() => propagate({ nodeData, message }), 250);
 }
 
 function getRecord(message: number) {
